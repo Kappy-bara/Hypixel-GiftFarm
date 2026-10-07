@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypixel Skyblock Gift Profit Calculator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg-dark: #09090b;
+            --bg-card: rgba(24, 24, 27, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --white-gift: #e2e8f0;
+            --green-gift: #34d399;
+            --red-gift: #f87171;
+            --party-gift: #c084fc;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 2rem;
+            line-height: 1.6;
+            background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 400px),
+                              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent 400px);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-live {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-live:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-live:active {
+            transform: translateY(1px);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 0.5px;
+        }
+
+        .white { color: var(--white-gift); text-shadow: 0 0 10px rgba(226, 232, 240, 0.3); }
+        .green { color: var(--green-gift); text-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
+        .red { color: var(--red-gift); text-shadow: 0 0 10px rgba(248, 113, 113, 0.3); }
+        .party { color: var(--party-gift); text-shadow: 0 0 10px rgba(192, 132, 252, 0.3); }
+        .market { color: #facc15; text-shadow: 0 0 10px rgba(250, 204, 21, 0.3); }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.4rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .input-group label span {
+            color: #52525b;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .table-container {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow-x: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover td {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: 600;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gift Profit Calculator</h1>
+        <p class="subtitle">Exact math models derived from official Hypixel Skyblock API weight tables</p>
+        
+        <div class="header-actions">
+            <button class="btn-live" onclick="fetchLivePrices()" id="fetch-btn">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Sync Live Bazaar Prices
+            </button>
+        </div>
+
+        <div class="grid" style="align-items: start;">
+            <!-- Card 1: Gift Costs -->
+            <div class="card">
+                <h2 class="card-title market">Live Market <span>(Gift Costs)</span></h2>
+                
+                <div class="input-group">
+                    <label>White Gift <span>(Order / Insta)</span></label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" id="price-white-gift-order" value="3800" oninput="calculateProfits()" title="Buy Order Cost">
+                        <input type="number" id="price-white-gift-insta" value="4000" oninput="calculateProfits()" title="Insta Buy Cost">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Green Gift <span>(Order / Insta)</span></label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" id="price-green-gift-order" value="14500" oninput="calculateProfits()">
+                        <input type="number" id="price-green-gift-insta" value="15000" oninput="calculateProfits()">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Red Gift <span>(Order / Insta)</span></label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" id="price-red-gift-order" value="82000" oninput="calculateProfits()">
+                        <input type="number" id="price-red-gift-insta" value="85000" oninput="calculateProfits()">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Party Gift <span>(Order / Insta)</span></label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" id="price-party-gift-order" value="240000" oninput="calculateProfits()">
+                        <input type="number" id="price-party-gift-insta" value="250000" oninput="calculateProfits()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Valuable Drops -->
+            <div class="card">
+                <h2 class="card-title" style="color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Valuable Drops</h2>
+                
+                <div class="input-group">
+                    <label>North Star <span>(AH Value)</span></label>
+                    <input type="number" id="price-NORTH_STAR" value="12000" oninput="calculateProfits()">
+                </div>
+                <div class="input-group">
+                    <label>Golden Gift <span>(AH Value)</span></label>
+                    <input type="number" id="price-GOLDEN_GIFT" value="1800000" oninput="calculateProfits()">
+                </div>
+                <div class="input-group">
+                    <label>Holly Dye <span>(AH Value)</span></label>
+                    <input type="number" id="price-HOLLY_DYE" value="10000000" oninput="calculateProfits()">
+                </div>
+                <div class="input-group">
+                    <label>Snowman Pet <span>(AH Value)</span></label>
+                    <input type="number" id="price-SNOWMAN_PET" value="1500000" oninput="calculateProfits()">
+                </div>
+                <div class="input-group">
+                    <label>Krampus Helmet <span>(AH Value)</span></label>
+                    <input type="number" id="price-KRAMPUS_HELMET" value="800000" oninput="calculateProfits()">
+                </div>
+            </div>
+
+            <!-- Card 3: Coin Boost Multipliers -->
+            <div class="card">
+                <h2 class="card-title" style="color: #facc15; border-bottom: 2px solid rgba(250, 204, 21, 0.5); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Coin Boost Multipliers</h2>
+                
+                <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                    <strong>Known Coin Multipliers:</strong>
+                    <ul style="margin-top: 0.5rem; margin-left: 1.5rem; list-style-type: disc;">
+                        <li><strong style="color: #e2e8f0;">Gift Talisman Line:</strong> White (+5%), Green (+10%), Blue (+15%), Purple (+20%), Gold (+25%)</li>
+                        <li><strong style="color: #e2e8f0;">Professional Gifter Perk:</strong> Doug NPC - Lvl I (+5%), Lvl II (+10%)</li>
+                        <li><strong style="color: #e2e8f0;">Snowman Mask:</strong> Rare Carnival Mask that boosts rewards</li>
+                        <li><strong style="color: #e2e8f0;">Snowfin Shard:</strong> Attribute shard used to buff gift loot</li>
+                    </ul>
+                </div>
+
+                <div class="input-group">
+                    <label>Total Bonus Coins <span>(%)</span></label>
+                    <input type="number" id="coin-multiplier" value="0" placeholder="e.g. 35 for 35%" oninput="calculateProfits()">
+                </div>
+            </div>
+        </div>
+
+        <div id="results-container" style="display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem;">
+            <!-- Populated by JS -->
+        </div>
+
+        <div id="toast" class="toast">Live prices synced!</div>
+
+    <script>
+
+        const dropDataRaw = {"source": "Hypixel SkyBlock Fandom Wiki API (https://hypixel-skyblock.fandom.com/api.php)", "scraped_date": "2026-10-07", "notes": ["All drop chances are calculated from a weight-based loot system: chance = weight / totalWeight.", "North Stars are a SEPARATE bonus roll from the main loot table (they don't consume a drop slot).", "The wiki references 'Gift Chances' on Google Sheets by Hypixel SkyBlock Data Acquisition: https://docs.google.com/spreadsheets/d/1uPKasPdpMhRLvZm9geCdVuTgcNVaMkF2scyO8BMKfNQ/edit", "Snowman Mask, White Gift Talisman line, Snowfin Shard and Professional Gifter perk from Doug give MORE rewards from Gifts.", "Party Gift has a 96.35% chance to roll from Red Gift's loot table, plus exclusive Party-tier items.", "Holly Dye chance is listed as 0.0125% (1 in 8000) on the wiki; its effective weight is ~0.485 on total weight 3876."], "white_gift": {"total_weight": 6649, "north_star_bonus": {"chance": 0.1, "amount": "1"}, "drops": [{"item": "2,000 Coins", "type": "coins", "coin_value": 2000, "weight": 2000, "chance_pct": 30.08, "one_in": 3.32}, {"item": "5,000 Coins", "type": "coins", "coin_value": 5000, "weight": 1000, "chance_pct": 15.04, "one_in": 6.65}, {"item": "10,000 Coins", "type": "coins", "coin_value": 10000, "weight": 500, "chance_pct": 7.52, "one_in": 13.3}, {"item": "250 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 1500, "chance_pct": 22.56, "one_in": 4.43}, {"item": "500 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 200, "chance_pct": 3.01, "one_in": 33.25}, {"item": "Skill XP Boost I Potion", "type": "potion", "coin_value": 0, "weight": 500, "chance_pct": 7.52, "one_in": 13.3}, {"item": "Skill XP Boost II Potion", "type": "potion", "coin_value": 0, "weight": 250, "chance_pct": 3.76, "one_in": 26.6}, {"item": "Ice Rune", "type": "item", "coin_value": null, "weight": 400, "chance_pct": 6.02, "one_in": 16.62}, {"item": "Battle Disc", "type": "item", "coin_value": null, "weight": 60, "chance_pct": 0.9, "one_in": 110.82}, {"item": "Winter Disc", "type": "item", "coin_value": null, "weight": 60, "chance_pct": 0.9, "one_in": 110.82}, {"item": "Snow Minion I", "type": "item", "coin_value": null, "weight": 30, "chance_pct": 0.45, "one_in": 221.63}, {"item": "Grinch Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.38, "one_in": 265.96}, {"item": "Gingerbread Man Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.38, "one_in": 265.96}, {"item": "Santa Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.38, "one_in": 265.96}, {"item": "Nutcracker", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.3, "one_in": 332.45}, {"item": "Present Stack", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.3, "one_in": 332.45}, {"item": "Tall Holiday Tree", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.3, "one_in": 332.45}, {"item": "Gift the Fish", "type": "item", "coin_value": null, "weight": 4, "chance_pct": 0.06, "one_in": 1662.25}, {"item": "Snow Suit Helmet", "type": "item", "coin_value": null, "weight": 2, "chance_pct": 0.03, "one_in": 3324.5}, {"item": "Snow Suit Chestplate", "type": "item", "coin_value": null, "weight": 3, "chance_pct": 0.05, "one_in": 2216.33}, {"item": "Snow Suit Leggings", "type": "item", "coin_value": null, "weight": 3, "chance_pct": 0.05, "one_in": 2216.33}, {"item": "Snow Suit Boots", "type": "item", "coin_value": null, "weight": 2, "chance_pct": 0.03, "one_in": 3324.5}], "avg_coins_per_gift": 2106}, "green_gift": {"total_weight": 6503, "north_star_bonus": {"chance": 0.3, "amount": "1-3"}, "drops": [{"item": "5,000 Coins", "type": "coins", "coin_value": 5000, "weight": 2000, "chance_pct": 30.76, "one_in": 3.25}, {"item": "10,000 Coins", "type": "coins", "coin_value": 10000, "weight": 1000, "chance_pct": 15.38, "one_in": 6.5}, {"item": "20,000 Coins", "type": "coins", "coin_value": 20000, "weight": 20, "chance_pct": 0.31, "one_in": 325.15}, {"item": "250 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 1500, "chance_pct": 23.07, "one_in": 4.34}, {"item": "500 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 500, "chance_pct": 7.69, "one_in": 13.01}, {"item": "2,500 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 1, "chance_pct": 0.02, "one_in": 6503.0}, {"item": "Skill XP Boost I Potion", "type": "potion", "coin_value": 0, "weight": 125, "chance_pct": 1.92, "one_in": 52.02}, {"item": "Skill XP Boost II Potion", "type": "potion", "coin_value": 0, "weight": 500, "chance_pct": 7.69, "one_in": 13.01}, {"item": "Skill XP Boost III Potion", "type": "potion", "coin_value": 0, "weight": 125, "chance_pct": 1.92, "one_in": 52.02}, {"item": "Ice Rune", "type": "item", "coin_value": null, "weight": 400, "chance_pct": 6.15, "one_in": 16.26}, {"item": "Battle Disc", "type": "item", "coin_value": null, "weight": 60, "chance_pct": 0.92, "one_in": 108.38}, {"item": "Winter Disc", "type": "item", "coin_value": null, "weight": 60, "chance_pct": 0.92, "one_in": 108.38}, {"item": "Snow Minion I", "type": "item", "coin_value": null, "weight": 50, "chance_pct": 0.77, "one_in": 130.06}, {"item": "Gingerbread Man Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.38, "one_in": 260.12}, {"item": "Grinch Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.38, "one_in": 260.12}, {"item": "Santa Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.38, "one_in": 260.12}, {"item": "Nutcracker", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.31, "one_in": 325.15}, {"item": "Present Stack", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.31, "one_in": 325.15}, {"item": "Tall Holiday Tree", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.31, "one_in": 325.15}, {"item": "Snow Suit Helmet", "type": "item", "coin_value": null, "weight": 4, "chance_pct": 0.06, "one_in": 1625.75}, {"item": "Snow Suit Chestplate", "type": "item", "coin_value": null, "weight": 6, "chance_pct": 0.09, "one_in": 1083.83}, {"item": "Snow Suit Leggings", "type": "item", "coin_value": null, "weight": 6, "chance_pct": 0.09, "one_in": 1083.83}, {"item": "Snow Suit Boots", "type": "item", "coin_value": null, "weight": 4, "chance_pct": 0.06, "one_in": 1625.75}, {"item": "Gift the Fish", "type": "item", "coin_value": null, "weight": 5, "chance_pct": 0.08, "one_in": 1300.6}, {"item": "Golden Gift", "type": "item", "coin_value": null, "weight": 2, "chance_pct": 0.03, "one_in": 3251.5}], "avg_coins_per_gift": 3137}, "red_gift": {"total_weight": 3876, "north_star_bonus": {"chance": 0.5, "amount": "1-5"}, "drops": [{"item": "5,000 Coins", "type": "coins", "coin_value": 5000, "weight": 400, "chance_pct": 10.32, "one_in": 9.69}, {"item": "20,000 Coins", "type": "coins", "coin_value": 20000, "weight": 750, "chance_pct": 19.35, "one_in": 5.17}, {"item": "100,000 Coins", "type": "coins", "coin_value": 100000, "weight": 20, "chance_pct": 0.52, "one_in": 193.82}, {"item": "1,000,000 Coins", "type": "coins", "coin_value": 1000000, "weight": 1, "chance_pct": 0.03, "one_in": 3876.48}, {"item": "250 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 100, "chance_pct": 2.58, "one_in": 38.76}, {"item": "500 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 1000, "chance_pct": 25.8, "one_in": 3.88}, {"item": "2,500 Skill XP", "type": "skill_xp", "coin_value": 0, "weight": 5, "chance_pct": 0.13, "one_in": 775.3}, {"item": "Skill XP Boost II Potion", "type": "potion", "coin_value": 0, "weight": 125, "chance_pct": 3.22, "one_in": 31.01}, {"item": "Skill XP Boost III Potion", "type": "potion", "coin_value": 0, "weight": 500, "chance_pct": 12.9, "one_in": 7.75}, {"item": "Ice Rune", "type": "item", "coin_value": null, "weight": 400, "chance_pct": 10.32, "one_in": 9.69}, {"item": "Winter Sack", "type": "item", "coin_value": null, "weight": 70, "chance_pct": 1.81, "one_in": 55.38}, {"item": "Snow Minion I", "type": "item", "coin_value": null, "weight": 65, "chance_pct": 1.68, "one_in": 59.64}, {"item": "Bottle of Jyrre", "type": "item", "coin_value": null, "weight": 60, "chance_pct": 1.55, "one_in": 64.61}, {"item": "Battle Disc", "type": "item", "coin_value": null, "weight": 60, "chance_pct": 1.55, "one_in": 64.61}, {"item": "Winter Disc", "type": "item", "coin_value": null, "weight": 60, "chance_pct": 1.55, "one_in": 64.61}, {"item": "Gingerbread Man Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.64, "one_in": 155.06}, {"item": "Grinch Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.64, "one_in": 155.06}, {"item": "Santa Minion Skin", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.64, "one_in": 155.06}, {"item": "Snow Suit Helmet", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.64, "one_in": 155.06}, {"item": "Snow Suit Chestplate", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.64, "one_in": 155.06}, {"item": "Snow Suit Leggings", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.64, "one_in": 155.06}, {"item": "Snow Suit Boots", "type": "item", "coin_value": null, "weight": 25, "chance_pct": 0.64, "one_in": 155.06}, {"item": "Nutcracker", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.52, "one_in": 193.82}, {"item": "Present Stack", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.52, "one_in": 193.82}, {"item": "Tall Holiday Tree", "type": "item", "coin_value": null, "weight": 20, "chance_pct": 0.52, "one_in": 193.82}, {"item": "Gift the Fish", "type": "item", "coin_value": null, "weight": 6, "chance_pct": 0.15, "one_in": 646.08}, {"item": "Golden Gift", "type": "item", "coin_value": null, "weight": 5, "chance_pct": 0.13, "one_in": 775.3}, {"item": "Krampus Helmet", "type": "item", "coin_value": null, "weight": 4, "chance_pct": 0.1, "one_in": 969.12}, {"item": "Fragmented Cryopowder", "type": "item", "coin_value": null, "weight": 4, "chance_pct": 0.1, "one_in": 969.12}, {"item": "Winter Island (Furniture)", "type": "item", "coin_value": null, "weight": 4, "chance_pct": 0.1, "one_in": 969.12}, {"item": "Snowman Pet (Legendary)", "type": "item", "coin_value": null, "weight": 2, "chance_pct": 0.05, "one_in": 1938.24}, {"item": "Holly Dye", "type": "item", "coin_value": null, "weight": 0.485, "chance_pct": 0.0125, "one_in": 8000.0}], "avg_coins_per_gift": 5160}, "party_gift": {"total_weight": 2138, "north_star_bonus": {"chance": 0.5, "amount": "1-5"}, "mechanic": "96.35% chance rolls from Red Gift loot table. 3.65% chance rolls Party-exclusive items.", "party_exclusive_drops": [{"item": "Party Gloves", "type": "party_exclusive", "weight": 15, "chance_pct": 0.7, "one_in": 142.53}, {"item": "Party Cloak", "type": "party_exclusive", "weight": 15, "chance_pct": 0.7, "one_in": 142.53}, {"item": "Snowman Mask", "type": "party_exclusive", "weight": 15, "chance_pct": 0.7, "one_in": 142.53}, {"item": "Party Top Hat", "type": "party_exclusive", "weight": 5, "chance_pct": 0.23, "one_in": 427.6}, {"item": "Carnival Ticket", "type": "party_exclusive", "weight": 25, "chance_pct": 1.17, "one_in": 85.52}, {"item": "Party the Fish", "type": "party_exclusive", "weight": 3, "chance_pct": 0.14, "one_in": 712.67}], "red_gift_redirect_weight": 2060, "red_gift_redirect_chance_pct": 96.35, "effective_red_gift_multiplier": 0.9635, "avg_coins_per_gift": 4972}, "computed_averages": {"white_gift": {"avg_coins_per_gift": 2106, "formula": "14,000,000 / 6649 = 2105.58", "avg_north_stars": 0.1, "north_stars_formula": "0.10 * 1 = 0.1"}, "green_gift": {"avg_coins_per_gift": 3137, "formula": "20,400,000 / 6503 = 3137.01", "avg_north_stars": 0.6, "north_stars_formula": "0.30 * avg(1,2,3) = 0.30 * 2 = 0.6"}, "red_gift": {"avg_coins_per_gift": 5160, "formula": "20,000,000 / 3876 = 5159.96", "avg_north_stars": 1.5, "north_stars_formula": "0.50 * avg(1,2,3,4,5) = 0.50 * 3 = 1.5"}, "party_gift": {"avg_coins_per_gift": 4972, "formula": "5159.96 * 0.9635 = 4971.62", "avg_north_stars": 1.5, "north_stars_formula": "0.50 * avg(1,2,3,4,5) = 0.50 * 3 = 1.5"}}};
+        
+        function getVal(id) {
+            return parseFloat(document.getElementById(id).value) || 0;
+        }
+        
+        function formatMoney(amount) {
+            return amount.toLocaleString('en-US', {maximumFractionDigits: 1});
+        }
+        
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = isError ? 'var(--danger)' : 'var(--success)';
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        let liveBazaarProducts = {};
+
+        async function fetchLivePrices() {
+            const btn = document.getElementById('fetch-btn');
+            btn.innerHTML = `<svg class="animate-spin" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Fetching...`;
+            btn.style.opacity = '0.7';
+            
+            try {
+                const response = await fetch("https://api.hypixel.net/v2/skyblock/bazaar");
+                const data = await response.json();
+                
+                if(data && data.success) {
+                    const products = data.products;
+                    liveBazaarProducts = products;
+                    
+                    if(products["WHITE_GIFT"]) {
+                        document.getElementById("price-white-gift-order").value = Math.floor(products["WHITE_GIFT"].quick_status.sellPrice);
+                        document.getElementById("price-white-gift-insta").value = Math.floor(products["WHITE_GIFT"].quick_status.buyPrice);
+                    }
+                    if(products["GREEN_GIFT"]) {
+                        document.getElementById("price-green-gift-order").value = Math.floor(products["GREEN_GIFT"].quick_status.sellPrice);
+                        document.getElementById("price-green-gift-insta").value = Math.floor(products["GREEN_GIFT"].quick_status.buyPrice);
+                    }
+                    if(products["RED_GIFT"]) {
+                        document.getElementById("price-red-gift-order").value = Math.floor(products["RED_GIFT"].quick_status.sellPrice);
+                        document.getElementById("price-red-gift-insta").value = Math.floor(products["RED_GIFT"].quick_status.buyPrice);
+                    }
+                    if(products["PARTY_GIFT"]) {
+                        document.getElementById("price-party-gift-order").value = Math.floor(products["PARTY_GIFT"].quick_status.sellPrice);
+                        document.getElementById("price-party-gift-insta").value = Math.floor(products["PARTY_GIFT"].quick_status.buyPrice);
+                    }
+                    
+                    calculateProfits();
+                    showToast("Successfully synced live Bazaar prices!");
+                } else {
+                    showToast("Failed to fetch Bazaar data.", true);
+                }
+            } catch(err) {
+                console.error(err);
+                showToast("Network error fetching API.", true);
+            } finally {
+                btn.innerHTML = `<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Sync Live Bazaar Prices`;
+                btn.style.opacity = '1';
+            }
+        }
+
+        function getKnownItemPrice(itemName) {
+            if (itemName === "North Stars") return getVal("price-NORTH_STAR");
+            if (itemName === "Golden Gift") return getVal("price-GOLDEN_GIFT");
+            if (itemName === "Holly Dye") return getVal("price-HOLLY_DYE");
+            if (itemName === "Snowman Pet (Legendary)") return getVal("price-SNOWMAN_PET");
+            if (itemName === "Krampus Helmet") return getVal("price-KRAMPUS_HELMET");
+            return 0; 
+        }
+
+        function getDropsHtml(giftKey, expectedValueDetails) {
+            const gData = dropDataRaw[giftKey];
+            if (!gData) return '';
+            
+            let html = `
+                <div style="margin-top: 1.5rem;">
+                    <div style="color: var(--text-muted); font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem;">Complete Drop Details</div>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; margin-top: 0.5rem;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);">Item</th>
+                                <th style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);">Chance</th>
+                                <th style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);">Calculation Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            const drops = [];
+            if (gData.north_star_bonus) drops.push({ item: "North Stars", chance_pct: gData.north_star_bonus.chance * 100, type: "item" });
+            if (gData.drops) drops.push(...gData.drops);
+            else if (giftKey === "party_gift" && dropDataRaw.red_gift.drops) drops.push(...dropDataRaw.red_gift.drops);
+            if (gData.party_exclusive_drops) drops.push(...gData.party_exclusive_drops);
+            
+            for (const d of drops) {
+                let valStr = `<span style="color: var(--text-muted);">0 (Ignored/Unknown)</span>`;
+                if (d.type === "coins") {
+                    valStr = `<span style="color: #facc15;">${d.coin_value.toLocaleString()} Coins</span>`;
+                } else {
+                    let p = getKnownItemPrice(d.item);
+                    if (p > 0) valStr = `<span style="color: var(--success); font-weight: 600;">${p.toLocaleString()} Coins</span>`;
+                }
+                
+                let chanceStr = (d.chance_pct || d.chance);
+                if (giftKey === "party_gift" && (!d.type || !d.type.includes("party_exclusive")) && d.item !== "North Stars") {
+                    chanceStr = (chanceStr * 0.9635).toFixed(2);
+                }
+
+                html += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 0.5rem; font-weight: 600;">${d.item}</td>
+                        <td style="padding: 0.5rem; color: #a1a1aa;">${chanceStr}%</td>
+                        <td style="padding: 0.5rem;">${valStr}</td>
+                    </tr>
+                `;
+            }
+            
+            html += `</tbody></table></div>`;
+            return html;
+        }
+
+        function calculateProfits() {
+            const gifts = [
+                { key: 'white_gift', name: 'White Gift', color: 'var(--white-gift)', costOrder: getVal('price-white-gift-order'), costInsta: getVal('price-white-gift-insta') },
+                { key: 'green_gift', name: 'Green Gift', color: 'var(--green-gift)', costOrder: getVal('price-green-gift-order'), costInsta: getVal('price-green-gift-insta') },
+                { key: 'red_gift', name: 'Red Gift', color: 'var(--red-gift)', costOrder: getVal('price-red-gift-order'), costInsta: getVal('price-red-gift-insta') },
+                { key: 'party_gift', name: 'Party Gift', color: 'var(--party-gift)', costOrder: getVal('price-party-gift-order'), costInsta: getVal('price-party-gift-insta') }
+            ];
+
+            
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = '';
+            
+            const coinBonusPct = getVal('coin-multiplier') / 100;
+
+            gifts.forEach(gift => {
+                const gData = dropDataRaw[gift.key];
+                const baseCoins = gData.avg_coins_per_gift * (1 + coinBonusPct);
+
+                
+                let expectedItemsValue = 0;
+                let itemBreakdownHtml = "";
+                
+                const drops = [];
+                if (gData.north_star_bonus) drops.push({ item: "North Stars", chance_pct: gData.north_star_bonus.chance * 100 });
+                if (gData.drops) drops.push(...gData.drops);
+                else if (gift.key === "party_gift" && dropDataRaw.red_gift.drops) drops.push(...dropDataRaw.red_gift.drops);
+                if (gData.party_exclusive_drops) drops.push(...gData.party_exclusive_drops);
+
+                drops.forEach(d => {
+                    if (d.type === "coins" || d.type === "skill_xp" || d.type === "potion") return;
+                    
+                    const price = getKnownItemPrice(d.item);
+                    if (price > 0) {
+                        let chance = (d.chance_pct || d.chance) / 100;
+                        
+                        if (gift.key === "party_gift" && (!d.type || !d.type.includes("party_exclusive")) && d.item !== "North Stars") {
+                            chance *= 0.9635;
+                        }
+                        
+                        let multiplier = 1;
+                        if (d.item === "North Stars") {
+                           if (gift.key === "green_gift") multiplier = 2; 
+                           if (gift.key === "red_gift" || gift.key === "party_gift") multiplier = 3; 
+                        }
+                        
+                        const expected = chance * multiplier * price;
+                        expectedItemsValue += expected;
+                        
+                        let chanceText = `${(chance*100).toFixed(2)}% chance`;
+                        if (d.item === "North Stars") chanceText = `${(chance*100).toFixed(0)}% chance &times; ${multiplier} avg`;
+                        
+                        itemBreakdownHtml += `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 1.05rem;">
+                                <span style="color: #a1a1aa;">${d.item} <span style="font-size:0.9rem; color:#71717a;">(${chanceText} &times; ${formatMoney(price)})</span></span>
+                                <span style="color: #e2e8f0; font-weight: 600;">${formatMoney(expected)}</span>
+                            </div>
+                        `;
+                    }
+                });
+                
+                const singleReturn = baseCoins + expectedItemsValue;
+                const totalReturn = singleReturn * 2; 
+                
+                const profitOrder = totalReturn - gift.costOrder;
+                const roiOrder = gift.costOrder > 0 ? (profitOrder / gift.costOrder) * 100 : 0;
+                
+                const profitInsta = totalReturn - gift.costInsta;
+                const roiInsta = gift.costInsta > 0 ? (profitInsta / gift.costInsta) * 100 : 0;
+                
+                const dropsHtml = getDropsHtml(gift.key);
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h2 class="card-title" style="color: ${gift.color}; border-bottom: 2px solid ${gift.color}40; margin-bottom: 1.2rem; padding-bottom: 0.5rem; font-size: 2rem;">
+                        ${gift.name} Profit Breakdown
+                    </h2>
+                    
+                    <div style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="color: var(--text-muted); font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">1. Expected Return (Single Gift)</div>
+                        
+                        
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 1.05rem;">
+                            <span style="color: #a1a1aa;">Base Coins <span style="font-size:0.9rem; color:#71717a;">(Mathematically guaranteed average${coinBonusPct > 0 ? ' + ' + (coinBonusPct*100).toFixed(0) + '% bonus' : ''})</span></span>
+                            <span style="color: #e2e8f0; font-weight: 600;">${formatMoney(baseCoins)}</span>
+                        </div>
+                        
+                        ${itemBreakdownHtml}
+                        
+                        <div style="display: flex; justify-content: space-between; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed rgba(255,255,255,0.1); font-size: 1.3rem;">
+                            <span style="color: #f8fafc; font-weight: 600;">Single Return <span style="font-size:0.95rem; color:#a1a1aa; font-weight:normal;">(Sum of above)</span></span>
+                            <span style="color: var(--accent); font-weight: 800;">${formatMoney(singleReturn)}</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <!-- Buy Order Box -->
+                        <div style="flex: 1; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="color: var(--text-muted); font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">2a. Profit (Buy Order)</div>
+
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 1.1rem;">
+                                <span style="color: #a1a1aa;">Total Yield <span style="font-size:0.9rem; color:#71717a;">(${formatMoney(singleReturn)} &times; 2 Players)</span></span>
+                                <span style="font-weight: 600;">${formatMoney(totalReturn)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 1.1rem;">
+                                <span style="color: #a1a1aa;">Cost of 1 Gift <span style="font-size:0.9rem; color:#71717a;">(Your expense)</span></span>
+                                <span style="color: var(--danger); font-weight: 600;">-${formatMoney(gift.costOrder)}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 1.6rem;">
+                                <span style="color: #f8fafc; font-weight: 800;">Net Profit</span>
+                                <span class="${profitOrder >= 0 ? 'positive' : 'negative'}" style="font-weight: 800;">
+                                    ${profitOrder >= 0 ? '+' : ''}${formatMoney(profitOrder)}
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 1.2rem;">
+                                <span style="color: #a1a1aa;">Return on Investment</span>
+                                <span class="${roiOrder >= 0 ? 'positive' : 'negative'}" style="font-weight: 600;">
+                                    ${roiOrder >= 0 ? '+' : ''}${roiOrder.toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Insta Buy Box -->
+                        <div style="flex: 1; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="color: var(--text-muted); font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">2b. Profit (Insta Buy)</div>
+
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 1.1rem;">
+                                <span style="color: #a1a1aa;">Total Yield <span style="font-size:0.9rem; color:#71717a;">(${formatMoney(singleReturn)} &times; 2 Players)</span></span>
+                                <span style="font-weight: 600;">${formatMoney(totalReturn)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 1.1rem;">
+                                <span style="color: #a1a1aa;">Cost of 1 Gift <span style="font-size:0.9rem; color:#71717a;">(Your expense)</span></span>
+                                <span style="color: var(--danger); font-weight: 600;">-${formatMoney(gift.costInsta)}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 1.6rem;">
+                                <span style="color: #f8fafc; font-weight: 800;">Net Profit</span>
+                                <span class="${profitInsta >= 0 ? 'positive' : 'negative'}" style="font-weight: 800;">
+                                    ${profitInsta >= 0 ? '+' : ''}${formatMoney(profitInsta)}
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 1.2rem;">
+                                <span style="color: #a1a1aa;">Return on Investment</span>
+                                <span class="${roiInsta >= 0 ? 'positive' : 'negative'}" style="font-weight: 600;">
+                                    ${roiInsta >= 0 ? '+' : ''}${roiInsta.toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${dropsHtml}
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // Run initially
+        calculateProfits();
+
+</script>
+</body>
+</html>
